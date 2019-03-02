@@ -104,7 +104,12 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+ // Materializedの設定
 
+jquery__WEBPACK_IMPORTED_MODULE_0___default()(function () {
+  // Materialized Menu
+  jquery__WEBPACK_IMPORTED_MODULE_0___default()('.button-collapse').sideNav();
+}); // end of document ready
 
 /***/ }),
 /* 1 */
