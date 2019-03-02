@@ -16,7 +16,21 @@ LGTM (Looks good to me) 画像を作成するためのサービス
 | /users/:twitterId/properties | GET | Twitter ユーザーのプロパティ情報の一覧の JSON を取得する Web API |
 
 ## 環境構築
+### 必要なソフトウェア
+- scala
+- sbt
+- docker
+- node
+
+### コマンド
 ```bash
 cd ./tool
 docker-compose up -d
+cd ..
+npm install
+```
+
+### jsコンパイル
+```bash
+node_modules/.bin/webpack --config conf/webpack.config.js
 ```
