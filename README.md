@@ -1,5 +1,5 @@
 # mojipic
-[N予備校 プログラミングコース 大規模Webアプリ 実践大規模Webアプリ](https://www.nnn.ed.nico/courses/146/chapters/4028)  
+[N予備校 プログラミングコース 大規模Webアプリ 実践大規模Webアプリ](https://www.nnn.ed.nico/courses/146/chapters/4028)
 LGTM (Looks good to me) 画像を作成するためのサービス
 
 ## URL 設計
@@ -33,4 +33,19 @@ npm install
 ### jsコンパイル
 ```bash
 node_modules/.bin/webpack --config conf/webpack.config.js
+```
+
+### DB確認
+- MySQL
+```bash
+docker exec -it mojipic-mysql mysql -u root -pmysql
+
+use mojipic;
+select * from picture_properties;
+```
+- Redis
+```bash
+docker exec -it mojipic-redis redis-cli -h localhost -p 6379
+
+LRANGE mojipic:tasks 0 0
 ```
