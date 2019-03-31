@@ -1,5 +1,6 @@
 tool/db_data
 tmp
+filesystem
 
 logs
 target
