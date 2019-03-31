@@ -16,11 +16,13 @@ LGTM (Looks good to me) 画像を作成するためのサービス
 | /users/:twitterId/properties | GET | Twitter ユーザーのプロパティ情報の一覧の JSON を取得する Web API |
 
 ## 環境構築
-### 必要なソフトウェア
+### 必要なソフトウェアや各種ファイル
 - scala
 - sbt
 - docker
 - node
+- ImageMagick
+- sp-setofont.ttf (ルートディレクトリに配置)
 
 ### コマンド
 ```bash

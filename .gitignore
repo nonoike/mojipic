@@ -1,6 +1,7 @@
 tool/db_data
 tmp
 filesystem
+sp-setofont.ttf
 
 logs
 target
