@@ -1,15 +1,18 @@
 package controllers
 
+import java.io.File
 import java.nio.file.{FileSystems, Files, Path, StandardCopyOption}
 import java.time.{Clock, LocalDateTime}
 
+import akka.stream.scaladsl.FileIO
 import javax.inject.{Inject, Singleton}
 import com.google.common.net.MediaType
 import com.redis.RedisClient
-import domain.entity.{PictureProperty, TwitterId}
+import domain.entity.{PictureId, PictureProperty, TwitterId}
 import domain.repository.PicturePropertyRepository
 import infrastructure.redis.RedisKeys
 import play.api.cache.SyncCacheApi
+import play.api.http.HttpEntity
 import play.api.libs.Files.TemporaryFile
 import play.api.mvc._
 import play.api.mvc.MultipartFormData.FilePart
@@ -52,6 +55,19 @@ class PictureController @Inject()(
         }
       case _ => Future.successful(Unauthorized("Need to login by Twitter and picture data."))
     }
+  }
+
+  def get(pictureId: Long) = Action.async { _ =>
+    val pictureProperty = picturePropertyRepository.find(PictureId(pictureId))
+    pictureProperty.map(pictureProperty => {
+      pictureProperty.value.convertedFilepath match {
+        case Some(convertedFilePath) =>
+          val file = new File(convertedFilePath)
+          val source = FileIO.fromPath(file.toPath)
+          Result(header = ResponseHeader(200, Map.empty), body = HttpEntity.Streamed(source, None, Some(pictureProperty.value.contentType.toString)))
+        case None => NotFound
+      }
+    })
   }
 
   private[this] def createPicturePropertyValue(
