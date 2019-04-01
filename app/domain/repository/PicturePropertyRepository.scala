@@ -21,4 +21,13 @@ trait PicturePropertyRepository {
     */
   def find(pictureId: PictureId): Future[PictureProperty]
 
+  /**
+    * 画像を更新する
+    *
+    * @param pictureId 画像ID
+    * @param value     値
+    * @return Future.successful(()) 更新に成功した
+    */
+  def update(pictureId: PictureId, value: PictureProperty.Value): Future[Unit]
+
 }

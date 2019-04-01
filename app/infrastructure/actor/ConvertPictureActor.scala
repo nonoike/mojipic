@@ -9,7 +9,7 @@ import domain.repository.PicturePropertyRepository
 import infrastructure.redis.RedisKeys
 import javax.inject.Inject
 import org.im4java.core.{ConvertCmd, IMOperation}
-import play.api.Configuration
+import play.api.{Configuration, Logger}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.{Failure, Success, Try}
@@ -48,10 +48,17 @@ class ConvertPictureActor @Inject()(
       invokeCmd(pictureProperty, filePath)
     } match {
       case Success(_) => PictureProperty(pictureProperty.id, pictureProperty.value.copy(status = PictureProperty.Status.Success, convertedFilepath = Some(filePath.toString)))
-      case Failure(t) => PictureProperty(pictureProperty.id, pictureProperty.value.copy(status = PictureProperty.Status.Failure))
+      case Failure(t) =>
+        Logger.error("Fail to convert.", t)
+        PictureProperty(pictureProperty.id, pictureProperty.value.copy(status = PictureProperty.Status.Failure))
     }
 
-    // TODO: 変換後の情報で picture_properties を更新
+    picturePropertyRepository
+      .update(convertedPictureProperty.id, convertedPictureProperty.value)
+      .onComplete {
+        case Success(_) => Logger.info(s"Converted and updated. convertedPictureProperty: $convertedPictureProperty")
+        case Failure(t) => Logger.error("Fail to update.", t)
+      }
   }
 
   private[this] def invokeCmd(property: PictureProperty, convertedFilepath: Path): Unit = {
