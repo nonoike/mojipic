@@ -1,5 +1,7 @@
 package infrastructure.repository
 
+import java.time.LocalDateTime
+
 import com.google.common.net.MediaType
 import domain.entity.{PictureId, PictureProperty, TwitterId}
 import domain.repository.PicturePropertyRepository
@@ -88,6 +90,56 @@ class PicturePropertyRepositoryImpl extends PicturePropertyRepository {
     })
   }
 
+  override def findAllByTwitterIdAndDateTime(twitterId: TwitterId, lastCreatedTime: LocalDateTime): Future[Seq[PictureProperty]] = {
+    Future.fromTry(Try {
+      using(DB(ConnectionPool.borrow())) { db =>
+        db.readOnly { implicit session => {
+          val sql =
+            sql"""SELECT
+                 | picture_id,
+                 | status,
+                 | twitter_id,
+                 | file_name,
+                 | content_type,
+                 | overlay_text,
+                 | overlay_text_size,
+                 | original_filepath,
+                 | converted_filepath,
+                 | created_time
+                 | FROM picture_properties
+                 | WHERE twitter_id = ${twitterId.value} AND created_time > $lastCreatedTime ORDER BY created_time DESC
+              """.stripMargin
+          sql.map(resultSetToPictureProperty).list().apply()
+        }
+        }
+      }
+    })
+  }
+
+  override def findAllByDateTime(lastCreatedTime: LocalDateTime): Future[Seq[PictureProperty]] = {
+    Future.fromTry(Try {
+      using(DB(ConnectionPool.borrow())) { db =>
+        db.readOnly { implicit session =>
+          val sql =
+            sql"""SELECT
+                 | picture_id,
+                 | status,
+                 | twitter_id,
+                 | file_name,
+                 | content_type,
+                 | overlay_text,
+                 | overlay_text_size,
+                 | original_filepath,
+                 | converted_filepath,
+                 | created_time
+                 | FROM picture_properties WHERE created_time > $lastCreatedTime ORDER BY created_time DESC
+              """.stripMargin
+          sql.map(resultSetToPictureProperty).list().apply()
+        }
+      }
+    })
+  }
+
   private[this] def resultSetToPictureProperty(rs: WrappedResultSet): PictureProperty = {
     val value =
       PictureProperty.Value(
@@ -103,5 +155,4 @@ class PicturePropertyRepositoryImpl extends PicturePropertyRepository {
       )
     PictureProperty(PictureId(rs.long("picture_id")), value)
   }
-
 }
